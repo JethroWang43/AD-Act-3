@@ -1,0 +1,17 @@
+{
+    "name": "jethrowang42/ad-meetingcalendar",
+    "type": "project",
+    "authors": [
+        {
+            "name": "JethroWang43",
+            "email": "202311220@fit.edu.ph"
+        }
+    ],
+    "scripts": {
+        "start": "php -S localhost:8000 router.php",
+        "postgresql:reset": "php utils/dbResetPostgresql.util.php"
+    },
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

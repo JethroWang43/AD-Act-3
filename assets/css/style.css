@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f8fb;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.status-box {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+.status-success {
+    background-color: #e7f9ed;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+.status-error {
+    background-color: #fdecea;
+    color: #c62828;
+    border: 1px solid #f44336;
+}
+h1 {
+    text-align: center;
+    color: #333;
+}
+form input, form button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+form button {
+    background-color: #2a9df4;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+form button:hover {
+    background-color: #1b7ec7;
+}
+.meeting-list {
+    margin-top: 30px;
+}
+.meeting {
+    background-color: #f1f1f1;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+.meeting-title {
+    font-weight: bold;
+}
+.meeting-time {
+    color: #555;
+}
