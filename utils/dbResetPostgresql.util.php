@@ -2,77 +2,51 @@
 declare(strict_types=1);
 
 // 1) Composer autoload
-require_once 'vendor/autoload.php';
+require 'vendor/autoload.php';
 
 // 2) Composer bootstrap
-require_once 'bootstrap.php';
+require 'bootstrap.php';
 
-// 3) envSetter
-$databases = require_once UTILS_PATH . '/envSetter.util.php';
-$pgConfig = $typeConfig['postgres'];
+// 3) Environment setter
+require_once UTILS_PATH . '/envSetter.util.php';
 
-
-$host = $pgConfig['pgHost'];
-$port = $pgConfig['pgPort'];
-$username = $pgConfig['pgUser'];
-$password = $pgConfig['pgPassword'];
-$dbname = $pgConfig['pgDB'];
-
-// Connect to PostgreSQL
-$dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
-$pdo = new PDO($dsn, $username, $password, [
+// ————————————————————————————————
+// 🔗 Connect to PostgreSQL
+// ————————————————————————————————
+$dsn = "pgsql:host={$pgConfig['host']};port={$pgConfig['port']};dbname={$pgConfig['db']}";
+$pdo = new PDO($dsn, $pgConfig['user'], $pgConfig['password'], [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 ]);
 
-echo "✅ Connected to PostgreSQL\n";
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+echo "📄 Applying schema from database/models/user.model.sql…\n";
 
-// List your table names and corresponding model SQL files
-$tables = [
-    'users' => 'database/users.model.sql',
-    // Add more tables and their model files here, e.g.:
-    // 'posts' => 'database/posts.model.sql',
-];
+// 📥 Load the SQL schema
+$sqlPath = BASE_PATH . '/database/models/user.model.sql';
+$sql = file_get_contents($sqlPath);
 
-// Apply schema for each table
-foreach ($tables as $table => $modelFile) {
-    echo "Applying schema from {$modelFile}…\n";
-    $sql = file_get_contents($modelFile);
-    if ($sql === false) {
-        throw new RuntimeException("Could not read {$modelFile}");
-    } else {
-        echo "Creation Success from the {$modelFile}\n";
-    }
-    $pdo->exec($sql);
-}
-
-// Truncate all tables
-echo "Truncating tables…\n";
-foreach (array_keys($tables) as $table) {
-    $pdo->exec("TRUNCATE TABLE {$table} RESTART IDENTITY CASCADE;");
-}
-```php
-// Just indicator it was working
-echo "Applying schema from database/users.model.sql…\n";
-
-$sql = file_get_contents('database/users.model.sql');
-
-// Another indicator but for failed creation
-// All tables have been truncated and schemas applied successfully.
+// ❌ Error if schema couldn't be read
 if ($sql === false) {
-  throw new RuntimeException("Could not read database/users.model.sql");
+    echo "❌ Failed to read: $sqlPath\n";
+    throw new RuntimeException("Could not read $sqlPath");
 } else {
-    echo "Creation Success from the database/users.model.sql";
+    echo "✅ Schema read successfully from $sqlPath\n";
 }
 
-// If your model.sql contains a working command it will be executed
+// ▶ Execute schema
 $pdo->exec($sql);
-```
-> repeat this code times the number of tables
+echo "🏗️  Tables created successfully.\n";
 
-- [ ] Make sure it clean the tables
-```php
-echo "Truncating tables…\n";
-foreach (['users'] as $table) {
-  $pdo->exec("TRUNCATE TABLE {$table} RESTART IDENTITY CASCADE;");
+// ————————————————————————————————
+// 🧹 Clean up tables
+// ————————————————————————————————
+echo "🧼 Truncating tables and resetting IDs…\n";
+$tables = ['users'];
+
+foreach ($tables as $table) {
+    $pdo->exec("TRUNCATE TABLE {$table} RESTART IDENTITY CASCADE;");
+    echo "🔁 Truncated: {$table}\n";
 }
-```
+
+echo "✅ All selected tables cleaned.\n";
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";

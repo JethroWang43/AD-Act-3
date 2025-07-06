@@ -18,7 +18,7 @@ if (!defined('COMPONENTS_PATH')) {
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/about.php">About</a></li>
-                <li><a href="/contact.php">Contact</a></li>
+                <li><a href="/pages/Login/index.php">Login</a></li>
             </ul>
         </nav>
     </header>

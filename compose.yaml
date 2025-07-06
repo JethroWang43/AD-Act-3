@@ -5,6 +5,7 @@ services:
     container_name: ad-meetingcalendar-service
     ports:
       - "8000:8000"
+      
     develop:
       watch:
         - path: .
@@ -14,6 +15,9 @@ services:
           action: rebuild
         - path: ./composer.lock
           action: rebuild
+        - path: ./.env                     # ✅ Add this line
+          target: /var/www/html/.env       # ✅ Ensures .env is available
+          action: sync          
     depends_on:
       - mongodb
 

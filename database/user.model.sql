@@ -1,3 +1,4 @@
+-- Active: 1750397424834@@127.0.0.1@5555@calendardb
 CREATE TABLE IF NOT EXISTS user(
     id SERIAL PRIMARY KEY,
     username VARCHAR(100) NOT NULL,

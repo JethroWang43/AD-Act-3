@@ -1,4 +1,4 @@
--- Active: 1750397424834@@127.0.0.1@5555@calendardb
+-- Active: 1750397424834@@127.0.0.1@5555@calendardb@public
 CREATE TABLE IF NOT EXISTS tasks (
     id SERIAL PRIMARY KEY,
     title VARCHAR(100) NOT NULL,

@@ -1,62 +1,46 @@
-<?php 
+<?php
 declare(strict_types=1);
-require_once 'vendor/autoload.php';
-require_once 'bootstrap.php';
 
-try {
- 
-    $dsn = "pgsql:host={$_ENV['POSTGRES_HOST']};port={$_ENV['POSTGRES_PORT']};dbname={$_ENV['POSTGRES_DB']}";
-    $pdo = new PDO($dsn, $_ENV['POSTGRES_USER'], $_ENV['POSTGRES_PASSWORD']);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// 1) Composer autoload
+require 'vendor/autoload.php';
 
-    $modelFiles = [
-        'user.model.sql',
-        'meeting.model.sql',
-        'meeting_users.model.sql',
-        'task.model.sql',
-    ];
+// 2) Composer bootstrap
+require 'bootstrap.php';
 
-    foreach ($modelFiles as $file) {
-        $modelPath= BASE_PATH . '/database/' . $file;
+// 3) envSetter
+require_once UTILS_PATH . '/envSetter.util.php';
 
-        if (!file_exists($modelPath)) {
-            echo "X Could not Read $file\n";
-            continue;
-        }
+// 4) Load static dummy data
+$users = require_once DUMMIES_PATH . '/users.staticData.php';
 
-        echo "📦 Applying schema from database/$file…\n\n";
-        $sql = file_get_contents($modelPath);
-        
-        if(trim($sql) == ''){
-            echo "⚠️ Skipped empty SQL file: $file\n\n";
-            continue;
-        }
-        
-        echo "💥 DEBUG: Content of $file:\n\n$sql\n\n";
-        $pdo->exec($sql);
-        echo "✅ Schema applied successfully from $file\n\n";
-    }
+// 5) Connect to PostgreSQL
+$dsn = "pgsql:host={$pgConfig['host']};port={$pgConfig['port']};dbname={$pgConfig['db']}";
+$pdo = new PDO($dsn, $pgConfig['user'], $pgConfig['password'], [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+]);
 
-    echo "Seeding useeeeers...\n";
+// 6) Seeding Logic
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+echo "📦 Starting PostgreSQL user seeding...\n";
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
 
-    $users = require_once STATICDATA_PATH . '/dummies/users.staticData.php';
+// Prepare query
+$stmt = $pdo->prepare("
+    INSERT INTO users (username, role, first_name, last_name, password)
+    VALUES (:username, :role, :fn, :ln, :pw)
+");
 
-     $stmt = $pdo->prepare("
-        INSERT INTO users (username, role, first_name, last_name, password)
-        VALUES (:username, :role, :fn, :ln, :pw)
-    ");
-
-    foreach ($users as $use) {
-        $stmt -> execute ([
-            ':username' => $use['username'],
-            ':role' => $use['role'],
-            ':fn' => $use['first_name'],
-            ':ln' => $use['last_name'],
-            ':pw' => password_hash($use['password'], PASSWORD_DEFAULT),
-        ]);
-    }
-    echo "✅ Users seeded successfully\n\n";
-} catch (PDOException $ex) {
-    echo "❌ Error seeding users: " . $ex->getMessage() . "\n";
-    exit(255);
+// Execute dummy inserts
+foreach ($users as $u) {
+    $stmt->execute([
+        ':username' => $u['username'],
+        ':role' => $u['role'],
+        ':fn' => $u['first_name'],
+        ':ln' => $u['last_name'],
+        ':pw' => password_hash($u['password'], PASSWORD_DEFAULT),
+    ]);
+    echo "✅ Inserted user: {$u['username']}\n";
 }
+
+echo "\n🎉 All users seeded successfully!\n";
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";

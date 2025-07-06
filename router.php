@@ -1,4 +1,5 @@
 <?php
+define('BASE_PATH', __DIR__);
 require __DIR__ . '/bootstrap.php';
 
 if (php_sapi_name() === 'cli-server') {
